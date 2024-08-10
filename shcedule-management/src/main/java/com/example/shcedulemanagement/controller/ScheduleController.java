@@ -7,10 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
 import java.util.List;
@@ -66,6 +63,27 @@ public class ScheduleController {
         ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(schedule);
 
         return scheduleResponseDto;
+    }
+
+    @GetMapping("/schedules/{id}")
+    public ScheduleResponseDto findById(@PathVariable int id) {
+        String sql = "select * from schedule_list where id = ?";
+
+        return jdbcTemplate.query(sql, resultSet -> {
+            if(resultSet.next()) {
+                Schedule schedule = new Schedule();
+                schedule.setId(resultSet.getInt("id"));
+                schedule.setTo_do(resultSet.getString("to_do"));
+                schedule.setManager(resultSet.getString("manager"));
+                schedule.setPw(resultSet.getString("pw"));
+                schedule.setCreated_at(resultSet.getTimestamp("created_at"));
+                schedule.setUpdated_at(resultSet.getTimestamp("updated_at"));
+                return new ScheduleResponseDto(schedule);
+            } else {
+                return null;
+            }
+        }, id);
+
     }
 
 }
