@@ -19,10 +19,9 @@ public class ScheduleRepository {
             int id = rs.getInt("id");
             String to_do = rs.getString("to_do");
             String manager = rs.getString("manager");
-            String pw = rs.getString("pw");
             Timestamp created_at = rs.getTimestamp("created_at");
             Timestamp updated_at = rs.getTimestamp("updated_at");
-            return new ScheduleResponseDto(id, to_do, manager, pw, created_at, updated_at);
+            return new ScheduleResponseDto(id, to_do, manager, created_at, updated_at);
         });
     }
 
@@ -33,7 +32,6 @@ public class ScheduleRepository {
             schedule.setId(rs.getInt("id"));
             schedule.setTo_do(rs.getString("to_do"));
             schedule.setManager(rs.getString("manager"));
-            schedule.setPw(rs.getString("pw"));
             schedule.setCreated_at(rs.getTimestamp("created_at"));
             schedule.setUpdated_at(rs.getTimestamp("updated_at"));
             return new ScheduleResponseDto(schedule);
@@ -87,10 +85,9 @@ public class ScheduleRepository {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             int id = rs.getInt("id");
             String to_do = rs.getString("to_do");
-            String pw = rs.getString("pw");
             Timestamp created_at = rs.getTimestamp("created_at");
             Timestamp updated_at = rs.getTimestamp("updated_at");
-            return new ScheduleResponseDto(id, to_do, manager, pw, created_at, updated_at);
+            return new ScheduleResponseDto(id, to_do, manager, created_at, updated_at);
         }, manager);
     }
 
@@ -100,10 +97,9 @@ public class ScheduleRepository {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             int id = rs.getInt("id");
             String to_do = rs.getString("to_do");
-            String pw = rs.getString("pw");
             Timestamp created_at = rs.getTimestamp("created_at");
             Timestamp updated_at = rs.getTimestamp("updated_at");
-            return new ScheduleResponseDto(id, to_do, manager, pw, created_at, updated_at);
+            return new ScheduleResponseDto(id, to_do, manager, created_at, updated_at);
         }, manager);
     }
 
