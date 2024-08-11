@@ -28,7 +28,7 @@ public class ScheduleRepository {
 
     // ResultSet 있다면 해당 데이터로 Dto 생성 후 반환
     private ScheduleResponseDto getScheduleResponseDto(ResultSet rs) throws SQLException {
-        if(rs.next()) {
+        if (rs.next()) {
             Schedule schedule = new Schedule();
             schedule.setId(rs.getInt("id"));
             schedule.setTo_do(rs.getString("to_do"));
@@ -54,7 +54,7 @@ public class ScheduleRepository {
     public Schedule save(Schedule schedule) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "insert into schedule_list (to_do, manager, pw) values (?, ?, ?)";
-        jdbcTemplate.update( con -> {
+        jdbcTemplate.update(con -> {
                     PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, schedule.getTo_do());
                     preparedStatement.setString(2, schedule.getManager());
@@ -108,14 +108,16 @@ public class ScheduleRepository {
     }
 
     public void update(int id, ScheduleRequestDto request) {
-        String sql = "update schedule_list set to_do = ?, manager = ? where id = ? and pw = ?";
-        jdbcTemplate.update(sql, request.getTo_do(), request.getManager(), id, request.getPw());
+        String sql = "update schedule_list set to_do = ?, manager = ?, updated_at = ? where id = ? and pw = ?";
+
+        jdbcTemplate.update(sql, request.getTo_do(), request.getManager(),
+                new Timestamp(System.currentTimeMillis()), id, request.getPw());
     }
 
     public String getPw(int id) {
         String sql = "select pw from schedule_list where id = ?";
         return jdbcTemplate.query(sql, rs -> {
-            if(rs.next()) {
+            if (rs.next()) {
                 return rs.getString("pw");
             } else {
                 return null;

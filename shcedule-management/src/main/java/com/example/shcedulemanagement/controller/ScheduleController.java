@@ -21,13 +21,12 @@ public class ScheduleController {
 
     @GetMapping("/schedules")
     public List<ScheduleResponseDto> getSchedules(@RequestParam(required = false) String sort, String manager) {
-        if(sort != null && sort.equalsIgnoreCase("updateDate")){
-            if(manager != null)
+        if (sort != null && sort.equalsIgnoreCase("updateDate")) {
+            if (manager != null)
                 return scheduleService.getSchedulesSortedByUpdateDateAndManager(manager);
             else
                 return scheduleService.getSchedulesSortedByUpdateDate();
-        }
-        else if(manager != null)
+        } else if (manager != null)
             return scheduleService.getSchedulesByManager(manager);
         else
             return scheduleService.getSchedules();

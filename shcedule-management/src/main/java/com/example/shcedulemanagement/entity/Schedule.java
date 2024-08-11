@@ -23,7 +23,5 @@ public class Schedule {
         this.to_do = request.getTo_do();
         this.manager = request.getManager();
         this.pw = request.getPw();
-//        this.created_at = request.getCreated_at();
-//        this.updated_at = request.getUpdated_at();
     }
 }

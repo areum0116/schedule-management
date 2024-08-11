@@ -43,26 +43,22 @@ public class ScheduleService {
     }
 
     public String updateSchedule(int id, ScheduleRequestDto request) {
-        if(scheduleRepository.findById(id) == null) {
+        if (scheduleRepository.findById(id) == null) {
             return "Schedule not found";
-        }
-        else if(!checkValidPw(id, request)) {
+        } else if (!checkValidPw(id, request)) {
             return "Incorrect password";
-        }
-        else {
+        } else {
             scheduleRepository.update(id, request);
             return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
         }
     }
 
     public String deleteSchedule(int id, ScheduleRequestDto request) {
-        if(scheduleRepository.findById(id) == null) {
+        if (scheduleRepository.findById(id) == null) {
             return "Schedule not found";
-        }
-        else if(!checkValidPw(id, request)) {
+        } else if (!checkValidPw(id, request)) {
             return "Incorrect password";
-        }
-        else {
+        } else {
             scheduleRepository.delete(id, request);
             return "Schedule deleted";
         }
