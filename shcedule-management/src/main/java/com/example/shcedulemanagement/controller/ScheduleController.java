@@ -43,4 +43,8 @@ public class ScheduleController {
         return scheduleRepository.findById(id);
     }
 
+    @PutMapping("/schedules/{id}")
+    public String updateSchedule(@PathVariable int id, @RequestBody ScheduleRequestDto request) {
+        return scheduleService.updateSchedule(id, request);
+    }
 }

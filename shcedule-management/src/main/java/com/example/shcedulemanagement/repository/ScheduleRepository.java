@@ -1,5 +1,6 @@
 package com.example.shcedulemanagement.repository;
 
+import com.example.shcedulemanagement.dto.ScheduleRequestDto;
 import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.entity.Schedule;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,10 +12,6 @@ import java.util.List;
 
 public class ScheduleRepository {
     private final JdbcTemplate jdbcTemplate;
-
-    public ScheduleRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     // 입력받은 sql 기준 Dto로 변환 후 리스트로 반환
     private List<ScheduleResponseDto> getScheduleResponseDtos(String sql) {
@@ -43,6 +40,10 @@ public class ScheduleRepository {
         } else {
             return null;
         }
+    }
+
+    public ScheduleRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public List<ScheduleResponseDto> findAll() {
@@ -105,4 +106,21 @@ public class ScheduleRepository {
             return new ScheduleResponseDto(id, to_do, manager, pw, created_at, updated_at);
         }, manager);
     }
+
+    public void update(int id, ScheduleRequestDto request) {
+        String sql = "update schedule_list set to_do = ?, manager = ? where id = ? and pw = ?";
+        jdbcTemplate.update(sql, request.getTo_do(), request.getManager(), id, request.getPw());
+    }
+
+    public String getPw(int id) {
+        String sql = "select pw from schedule_list where id = ?";
+        return jdbcTemplate.query(sql, rs -> {
+            if(rs.next()) {
+                return rs.getString("pw");
+            } else {
+                return null;
+            }
+        }, id);
+    }
+
 }

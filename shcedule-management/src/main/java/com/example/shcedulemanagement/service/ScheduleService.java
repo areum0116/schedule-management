@@ -6,10 +6,19 @@ import com.example.shcedulemanagement.entity.Schedule;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
+
+    // 입력받은 비밀번호 검사
+    private boolean checkValidPw(int id, ScheduleRequestDto request) {
+        if(scheduleRepository.getPw(id) != null && scheduleRepository.getPw(id).equals(request.getPw())) {
+            return true;
+        }
+        return false;
+    }
 
     public ScheduleService(JdbcTemplate jdbcTemplate) {
         scheduleRepository = new ScheduleRepository(jdbcTemplate);
@@ -35,4 +44,18 @@ public class ScheduleService {
     public List<ScheduleResponseDto> getSchedulesSortedByUpdateDateAndManager(String manager) {
         return scheduleRepository.findLatestUpdatedByManager(manager);
     }
+
+    public String updateSchedule(int id, ScheduleRequestDto request) {
+        if(scheduleRepository.findById(id) == null) {
+            return "Schedule not found";
+        }
+        else if(!checkValidPw(id, request)) {
+            return "Incorrect password";
+        }
+        else {
+            scheduleRepository.update(id, request);
+            return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
+        }
+    }
+
 }
