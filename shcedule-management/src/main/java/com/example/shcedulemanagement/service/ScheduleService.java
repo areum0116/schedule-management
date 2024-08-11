@@ -9,26 +9,30 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.List;
 
 public class ScheduleService {
-
-    private final JdbcTemplate jdbcTemplate;
+    private final ScheduleRepository scheduleRepository;
 
     public ScheduleService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        scheduleRepository = new ScheduleRepository(jdbcTemplate);
     }
 
     public List<ScheduleResponseDto> getSchedules() {
-        ScheduleRepository scheduleRepository = new ScheduleRepository(jdbcTemplate);
         return scheduleRepository.findAll();
     }
 
     public ScheduleResponseDto createSchedule(ScheduleRequestDto request) {
-        Schedule schedule = new Schedule(request);
+        Schedule savedSchedule = scheduleRepository.save(new Schedule(request));
+        return new ScheduleResponseDto(savedSchedule);
+    }
 
-        ScheduleRepository scheduleRepository = new ScheduleRepository(jdbcTemplate);
-        Schedule savedSchedule = scheduleRepository.save(schedule);
+    public List<ScheduleResponseDto> getSchedulesSortedByUpdateDate() {
+        return scheduleRepository.findLatestUpdated();
+    }
 
-        ScheduleResponseDto scheduleResponseDto = new ScheduleResponseDto(savedSchedule);
+    public List<ScheduleResponseDto> getSchedulesByManager(String manager) {
+        return scheduleRepository.findByManager(manager);
+    }
 
-        return scheduleResponseDto;
+    public List<ScheduleResponseDto> getSchedulesSortedByUpdateDateAndManager(String manager) {
+        return scheduleRepository.findLatestUpdatedByManager(manager);
     }
 }

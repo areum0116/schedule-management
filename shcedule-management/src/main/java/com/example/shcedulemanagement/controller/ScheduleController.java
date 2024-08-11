@@ -11,27 +11,36 @@ import java.util.List;
 
 @RestController
 public class ScheduleController {
-    private final JdbcTemplate jdbcTemplate;
+    private final ScheduleService scheduleService;
+    private final ScheduleRepository scheduleRepository;
 
     public ScheduleController(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        scheduleService = new ScheduleService(jdbcTemplate);
+        scheduleRepository = new ScheduleRepository(jdbcTemplate);
     }
 
     @GetMapping("/schedules")
-    public List<ScheduleResponseDto> getSchedules() {
-        ScheduleService scheduleService = new ScheduleService(jdbcTemplate);
-        return scheduleService.getSchedules();
+    public List<ScheduleResponseDto> getSchedules(@RequestParam(required = false) String sort, String manager) {
+        if(sort != null && sort.equalsIgnoreCase("updateDate")){
+            if(manager != null)
+                return scheduleService.getSchedulesSortedByUpdateDateAndManager(manager);
+            else
+                return scheduleService.getSchedulesSortedByUpdateDate();
+        }
+        else if(manager != null)
+            return scheduleService.getSchedulesByManager(manager);
+        else
+            return scheduleService.getSchedules();
     }
 
     @PostMapping("/schedules")
     public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto request) {
-        ScheduleService scheduleService = new ScheduleService(jdbcTemplate);
         return scheduleService.createSchedule(request);
     }
 
     @GetMapping("/schedules/{id}")
     public ScheduleResponseDto findById(@PathVariable int id) {
-        ScheduleRepository scheduleRepository = new ScheduleRepository(jdbcTemplate);;
         return scheduleRepository.findById(id);
     }
+
 }
