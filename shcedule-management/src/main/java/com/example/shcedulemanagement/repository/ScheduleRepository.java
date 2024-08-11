@@ -123,4 +123,8 @@ public class ScheduleRepository {
         }, id);
     }
 
+    public void delete(int id, ScheduleRequestDto request) {
+        String sql = "delete from schedule_list where id = ? and pw = ?";
+        jdbcTemplate.update(sql, id, request.getPw());
+    }
 }
