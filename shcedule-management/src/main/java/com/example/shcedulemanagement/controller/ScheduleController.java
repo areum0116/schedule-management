@@ -4,7 +4,6 @@ import com.example.shcedulemanagement.dto.ScheduleRequestDto;
 import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
 import com.example.shcedulemanagement.service.ScheduleService;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,9 +13,9 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
     private final ScheduleRepository scheduleRepository;
 
-    public ScheduleController(JdbcTemplate jdbcTemplate) {
-        scheduleService = new ScheduleService(jdbcTemplate);
-        scheduleRepository = new ScheduleRepository(jdbcTemplate);
+    public ScheduleController(ScheduleService scheduleService, ScheduleRepository scheduleRepository) {
+        this.scheduleService = scheduleService;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @GetMapping("/schedules")

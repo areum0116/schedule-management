@@ -4,11 +4,12 @@ import com.example.shcedulemanagement.dto.ScheduleRequestDto;
 import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.entity.Schedule;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+@Service
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
@@ -17,8 +18,8 @@ public class ScheduleService {
         return scheduleRepository.getPw(id) != null && scheduleRepository.getPw(id).equals(request.getPw());
     }
 
-    public ScheduleService(JdbcTemplate jdbcTemplate) {
-        scheduleRepository = new ScheduleRepository(jdbcTemplate);
+    public ScheduleService(ScheduleRepository scheduleRepository) {
+        this.scheduleRepository = scheduleRepository;
     }
 
     public List<ScheduleResponseDto> getSchedules() {
