@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 public class Schedule {
     private int id;
     private String to_do;
-    private String manager;
+    private int manager_id;
     private String pw;
     private Timestamp created_at;
     private Timestamp updated_at;
@@ -21,7 +21,7 @@ public class Schedule {
 
     public Schedule(ScheduleRequestDto request) {
         this.to_do = request.getTo_do();
-        this.manager = request.getManager();
+        this.manager_id = request.getManager_id();
         this.pw = request.getPw();
     }
 }

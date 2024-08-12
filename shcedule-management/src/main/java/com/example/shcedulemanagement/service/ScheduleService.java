@@ -35,12 +35,12 @@ public class ScheduleService {
         return scheduleRepository.findLatestUpdated();
     }
 
-    public List<ScheduleResponseDto> getSchedulesByManager(String manager) {
-        return scheduleRepository.findByManager(manager);
+    public List<ScheduleResponseDto> getSchedulesByManager(int manager_id) {
+        return scheduleRepository.findByManager(manager_id);
     }
 
-    public List<ScheduleResponseDto> getSchedulesSortedByUpdateDateAndManager(String manager) {
-        return scheduleRepository.findLatestUpdatedByManager(manager);
+    public List<ScheduleResponseDto> getSchedulesSortedByUpdateDateAndManager(int manager_id) {
+        return scheduleRepository.findLatestUpdatedByManager(manager_id);
     }
 
     public String updateSchedule(int id, ScheduleRequestDto request) {

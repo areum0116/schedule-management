@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class ScheduleRequestDto {
     private String to_do;
-    private String manager;
+    private int manager_id;
     private String pw;
 }

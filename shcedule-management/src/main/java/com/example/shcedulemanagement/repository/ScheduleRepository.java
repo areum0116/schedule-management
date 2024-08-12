@@ -20,10 +20,10 @@ public class ScheduleRepository {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             int id = rs.getInt("id");
             String to_do = rs.getString("to_do");
-            String manager = rs.getString("manager");
+            int manager_id = rs.getInt("manager_id");
             Timestamp created_at = rs.getTimestamp("created_at");
             Timestamp updated_at = rs.getTimestamp("updated_at");
-            return new ScheduleResponseDto(id, to_do, manager, created_at, updated_at);
+            return new ScheduleResponseDto(id, to_do, manager_id, created_at, updated_at);
         });
     }
 
@@ -33,7 +33,7 @@ public class ScheduleRepository {
             Schedule schedule = new Schedule();
             schedule.setId(rs.getInt("id"));
             schedule.setTo_do(rs.getString("to_do"));
-            schedule.setManager(rs.getString("manager"));
+            schedule.setManager_id(rs.getInt("manager_id"));
             schedule.setCreated_at(rs.getTimestamp("created_at"));
             schedule.setUpdated_at(rs.getTimestamp("updated_at"));
             return new ScheduleResponseDto(schedule);
@@ -53,11 +53,11 @@ public class ScheduleRepository {
 
     public Schedule save(Schedule schedule) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        String sql = "insert into schedule_list (to_do, manager, pw) values (?, ?, ?)";
+        String sql = "insert into schedule_list (to_do, manager_id, pw) values (?, ?, ?)";
         jdbcTemplate.update(con -> {
                     PreparedStatement preparedStatement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     preparedStatement.setString(1, schedule.getTo_do());
-                    preparedStatement.setString(2, schedule.getManager());
+                    preparedStatement.setInt(2, schedule.getManager_id());
                     preparedStatement.setString(3, schedule.getPw());
                     return preparedStatement;
                 },
@@ -82,33 +82,33 @@ public class ScheduleRepository {
     }
 
     // 담당자명 기준 조건 리스트 반환
-    public List<ScheduleResponseDto> findByManager(String manager) {
-        String sql = "select * from schedule_list where manager = ?";
+    public List<ScheduleResponseDto> findByManager(int manager_id) {
+        String sql = "select * from schedule_list where manager_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             int id = rs.getInt("id");
             String to_do = rs.getString("to_do");
             Timestamp created_at = rs.getTimestamp("created_at");
             Timestamp updated_at = rs.getTimestamp("updated_at");
-            return new ScheduleResponseDto(id, to_do, manager, created_at, updated_at);
-        }, manager);
+            return new ScheduleResponseDto(id, to_do, manager_id, created_at, updated_at);
+        }, manager_id);
     }
 
     // 수정일, 담담자명 기준
-    public List<ScheduleResponseDto> findLatestUpdatedByManager(String manager) {
-        String sql = "select * from schedule_list where manager = ? order by updated_at desc";
+    public List<ScheduleResponseDto> findLatestUpdatedByManager(int manager_id) {
+        String sql = "select * from schedule_list where manager_id = ? order by updated_at desc";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             int id = rs.getInt("id");
             String to_do = rs.getString("to_do");
             Timestamp created_at = rs.getTimestamp("created_at");
             Timestamp updated_at = rs.getTimestamp("updated_at");
-            return new ScheduleResponseDto(id, to_do, manager, created_at, updated_at);
-        }, manager);
+            return new ScheduleResponseDto(id, to_do, manager_id, created_at, updated_at);
+        }, manager_id);
     }
 
     public void update(int id, ScheduleRequestDto request) {
-        String sql = "update schedule_list set to_do = ?, manager = ?, updated_at = ? where id = ? and pw = ?";
+        String sql = "update schedule_list set to_do = ?, manager_id = ?, updated_at = ? where id = ? and pw = ?";
 
-        jdbcTemplate.update(sql, request.getTo_do(), request.getManager(),
+        jdbcTemplate.update(sql, request.getTo_do(), request.getManager_id(),
                 new Timestamp(System.currentTimeMillis()), id, request.getPw());
     }
 
