@@ -5,11 +5,14 @@ import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.exceptions.InvalidEntityIdException;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
 import com.example.shcedulemanagement.service.ScheduleService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class ScheduleController {
@@ -38,7 +41,9 @@ public class ScheduleController {
 
     // 일정 생성
     @PostMapping("/schedules")
-    public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto request) {
+    public ScheduleResponseDto createSchedule(@RequestBody @Valid ScheduleRequestDto request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())  // 잘못된 입력 (할일 최대 200자, 필수값, 비밀번호 필수값)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
         return scheduleService.createSchedule(request);
     }
 
@@ -47,12 +52,15 @@ public class ScheduleController {
     public ScheduleResponseDto findById(@PathVariable int id) {
         // 잘못된 정보 조회
         if(scheduleRepository.findById(id) == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule not found");
-        else return scheduleRepository.findById(id);
+        return scheduleRepository.findById(id);
     }
 
     // 일정 수정
     @PutMapping("/schedules/{id}")
-    public String updateSchedule(@PathVariable int id, @RequestBody ScheduleRequestDto request) {
+    public String updateSchedule(@PathVariable int id, @RequestBody @Valid ScheduleRequestDto request, BindingResult bindingResult) {
+        // 잘못된 입력 (할일 최대 200자, 필수값, 비밀번호 필수값)
+        if (bindingResult.hasErrors()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+
         try {
             return scheduleService.updateSchedule(id, request);
         } catch (Exception e) {
