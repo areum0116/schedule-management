@@ -64,5 +64,4 @@ public class ScheduleService {
             return "Schedule deleted";
         }
     }
-
 }
