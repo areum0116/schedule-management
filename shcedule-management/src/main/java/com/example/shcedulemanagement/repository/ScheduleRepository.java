@@ -8,7 +8,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -25,21 +27,6 @@ public class ScheduleRepository {
             Timestamp updated_at = rs.getTimestamp("updated_at");
             return new ScheduleResponseDto(id, to_do, manager_id, created_at, updated_at);
         });
-    }
-
-    // ResultSet 있다면 해당 데이터로 Dto 생성 후 반환
-    private ScheduleResponseDto getScheduleResponseDto(ResultSet rs) throws SQLException {
-        if (rs.next()) {
-            Schedule schedule = new Schedule();
-            schedule.setId(rs.getInt("id"));
-            schedule.setTo_do(rs.getString("to_do"));
-            schedule.setManager_id(rs.getInt("manager_id"));
-            schedule.setCreated_at(rs.getTimestamp("created_at"));
-            schedule.setUpdated_at(rs.getTimestamp("updated_at"));
-            return new ScheduleResponseDto(schedule);
-        } else {
-            return null;
-        }
     }
 
     // 생성자 주입
@@ -76,7 +63,19 @@ public class ScheduleRepository {
     // id로 일정 검색 후 responseDto 반환
     public ScheduleResponseDto findById(int id) {
         String sql = "select * from schedule_list where id = ?";
-        return jdbcTemplate.query(sql, this::getScheduleResponseDto, id);
+        return jdbcTemplate.query(sql, rs -> {
+            if (rs.next()) {
+                Schedule schedule = new Schedule();
+                schedule.setId(rs.getInt("id"));
+                schedule.setTo_do(rs.getString("to_do"));
+                schedule.setManager_id(rs.getInt("manager_id"));
+                schedule.setCreated_at(rs.getTimestamp("created_at"));
+                schedule.setUpdated_at(rs.getTimestamp("updated_at"));
+                return new ScheduleResponseDto(schedule);
+            } else {
+                return null;
+            }
+        }, id);
     }
 
     // 수정일 기준 내림차순 정렬 결과 리스트 반환

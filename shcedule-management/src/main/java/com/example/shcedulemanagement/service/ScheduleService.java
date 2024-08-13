@@ -3,6 +3,8 @@ package com.example.shcedulemanagement.service;
 import com.example.shcedulemanagement.dto.ScheduleRequestDto;
 import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.entity.Schedule;
+import com.example.shcedulemanagement.exceptions.InvalidEntityIdException;
+import com.example.shcedulemanagement.exceptions.InvalidPasswordException;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
@@ -50,11 +52,11 @@ public class ScheduleService {
     }
 
     // 일정 수정
-    public String updateSchedule(int id, ScheduleRequestDto request) {
-        if (scheduleRepository.findById(id) == null) {
-            return "Schedule not found";
-        } else if (!checkValidPw(id, request)) {
-            return "Incorrect password";
+    public String updateSchedule(int id, ScheduleRequestDto request) throws InvalidEntityIdException, InvalidPasswordException {
+        if (scheduleRepository.findById(id) == null) {  // 존재하지 않는 id
+            throw new InvalidEntityIdException("No such entity with id " + id);
+        } else if (!checkValidPw(id, request)) {    // 틀린 비밀번호
+            throw new InvalidPasswordException("Invalid password");
         } else {
             scheduleRepository.update(id, request);
             return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
@@ -62,11 +64,11 @@ public class ScheduleService {
     }
 
     // 일정 삭제
-    public String deleteSchedule(int id, ScheduleRequestDto request) {
-        if (scheduleRepository.findById(id) == null) {
-            return "Schedule not found";
-        } else if (!checkValidPw(id, request)) {
-            return "Incorrect password";
+    public String deleteSchedule(int id, ScheduleRequestDto request) throws InvalidEntityIdException, InvalidPasswordException {
+        if (scheduleRepository.findById(id) == null) {  // 존재하지 않는 id
+            throw new InvalidEntityIdException("No such entity with id " + id);
+        } else if (!checkValidPw(id, request)) {    // 틀린 비밀번호
+            throw new InvalidPasswordException("Invalid password");
         } else {
             scheduleRepository.delete(id, request);
             return "Schedule deleted";

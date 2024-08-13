@@ -2,9 +2,12 @@ package com.example.shcedulemanagement.controller;
 
 import com.example.shcedulemanagement.dto.ScheduleRequestDto;
 import com.example.shcedulemanagement.dto.ScheduleResponseDto;
+import com.example.shcedulemanagement.exceptions.InvalidEntityIdException;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
 import com.example.shcedulemanagement.service.ScheduleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,19 +45,33 @@ public class ScheduleController {
     // id로 단건 일정 검색
     @GetMapping("/schedules/{id}")
     public ScheduleResponseDto findById(@PathVariable int id) {
-        return scheduleRepository.findById(id);
+        // 잘못된 정보 조회
+        if(scheduleRepository.findById(id) == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule not found");
+        else return scheduleRepository.findById(id);
     }
 
     // 일정 수정
     @PutMapping("/schedules/{id}")
     public String updateSchedule(@PathVariable int id, @RequestBody ScheduleRequestDto request) {
-        return scheduleService.updateSchedule(id, request);
+        try {
+            return scheduleService.updateSchedule(id, request);
+        } catch (Exception e) {
+            if(e instanceof InvalidEntityIdException)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage()); // 존재하지 않는 id
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage()); // 비밀번호 불일치
+        }
     }
 
     // 일정 삭제
     @DeleteMapping("/schedules/{id}")
     public String deleteSchedule(@PathVariable int id, @RequestBody ScheduleRequestDto request) {
-        return scheduleService.deleteSchedule(id, request);
+        try {
+            return scheduleService.deleteSchedule(id, request);
+        } catch (Exception e) {
+            if(e instanceof InvalidEntityIdException)
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage()); // 존재하지 않는 id
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage()); // 비밀번호 불일치
+        }
     }
 
     // 페이지네이션
