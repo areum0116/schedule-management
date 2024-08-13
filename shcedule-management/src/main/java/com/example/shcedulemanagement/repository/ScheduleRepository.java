@@ -134,4 +134,18 @@ public class ScheduleRepository {
         String sql = "delete from schedule_list where id = ? and pw = ?";
         jdbcTemplate.update(sql, id, request.getPw());
     }
+
+    // 페이지네이션
+    public List<ScheduleResponseDto> findByPage(int page, int size) {
+        String sql = "select * from schedule_list s join manager m on s.manager_id = m.id limit ? offset ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            int id = rs.getInt("id");
+            String to_do = rs.getString("to_do");
+            int manager_id = rs.getInt("manager_id");
+            String manager_name = rs.getString("name");
+            Timestamp created_at = rs.getTimestamp("created_at");
+            Timestamp updated_at = rs.getTimestamp("updated_at");
+            return new ScheduleResponseDto(id, to_do, manager_id, manager_name, created_at, updated_at);
+        }, size, page);
+    }
 }

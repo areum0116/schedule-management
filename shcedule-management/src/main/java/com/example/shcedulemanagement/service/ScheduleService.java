@@ -72,4 +72,9 @@ public class ScheduleService {
             return "Schedule deleted";
         }
     }
+
+    // 페이지네이션
+    public List<ScheduleResponseDto> getSchedulesV2(int page, int size) {
+        return scheduleRepository.findByPage(page, size);
+    }
 }

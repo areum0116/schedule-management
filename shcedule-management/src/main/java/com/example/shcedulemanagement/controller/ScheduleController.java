@@ -31,8 +31,6 @@ public class ScheduleController {
             return scheduleService.getSchedulesByManager(manager_id);
         else // 둘 다 해당 X (전체 조회)
             return scheduleService.getSchedules();
-
-
     }
 
     // 일정 생성
@@ -59,5 +57,13 @@ public class ScheduleController {
         return scheduleService.deleteSchedule(id, request);
     }
 
-
+    // 페이지네이션
+    @GetMapping("/v2/schedules")
+    public List<ScheduleResponseDto> getSchedulesV2(@RequestParam(required = false) Integer page, Integer size) {
+        if(page != null && size != null) {
+            return scheduleService.getSchedulesV2(page, size);
+        } else {
+            return scheduleService.getSchedules();
+        }
+    }
 }
