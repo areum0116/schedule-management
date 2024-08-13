@@ -15,3 +15,6 @@
 |매니저 기준 일정 조회|**GET**|/schedules?manager={manager}|경로 변수|다건 혹은 단건 응답 정보|200: 정상조회|
 |일정 수정|**PUT**|/schedules/{id}|요청 body|수정 날짜|200: 정상수정|
 |일정 삭제|**DELETE**|/schedules/{id}|요청 body|정상 삭제 메시지|200: 정상삭제|
+|담당자 등록|**POST**|/managers|요청 body|등록 정보|200: 정상등록|
+|담당자 전체 조회|**GET**|/managers|요청 param|다건 응답 정보|200: 정상조회|
+|페이지네이션|GET|/v2/schedules?page={page}&size={size}|경로 변수|다건 응답 정보|200: 정상 조회|
