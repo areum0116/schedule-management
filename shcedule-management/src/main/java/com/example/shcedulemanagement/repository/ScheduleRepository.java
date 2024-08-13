@@ -42,15 +42,18 @@ public class ScheduleRepository {
         }
     }
 
+    // 생성자 주입
     public ScheduleRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // 일정 전체 반환
     public List<ScheduleResponseDto> findAll() {
         String sql = "select * from schedule_list";
         return getScheduleResponseDtos(sql);
     }
 
+    // 단건 일정 저장 후 반환
     public Schedule save(Schedule schedule) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "insert into schedule_list (to_do, manager_id, pw) values (?, ?, ?)";
@@ -70,6 +73,7 @@ public class ScheduleRepository {
         return schedule;
     }
 
+    // id로 일정 검색 후 responseDto 반환
     public ScheduleResponseDto findById(int id) {
         String sql = "select * from schedule_list where id = ?";
         return jdbcTemplate.query(sql, this::getScheduleResponseDto, id);
@@ -81,7 +85,7 @@ public class ScheduleRepository {
         return getScheduleResponseDtos(sql);
     }
 
-    // 담당자명 기준 조건 리스트 반환
+    // 담당자 id 기준 리스트 반환
     public List<ScheduleResponseDto> findByManager(int manager_id) {
         String sql = "select * from schedule_list where manager_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -93,7 +97,7 @@ public class ScheduleRepository {
         }, manager_id);
     }
 
-    // 수정일, 담담자명 기준
+    // 수정일, 담담자 id 기준 리스트 반환
     public List<ScheduleResponseDto> findLatestUpdatedByManager(int manager_id) {
         String sql = "select * from schedule_list where manager_id = ? order by updated_at desc";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -105,6 +109,7 @@ public class ScheduleRepository {
         }, manager_id);
     }
 
+    // 일정 수정
     public void update(int id, ScheduleRequestDto request) {
         String sql = "update schedule_list set to_do = ?, manager_id = ?, updated_at = ? where id = ? and pw = ?";
 
@@ -112,6 +117,7 @@ public class ScheduleRepository {
                 new Timestamp(System.currentTimeMillis()), id, request.getPw());
     }
 
+    // 일정 비밀번호 검색 후 반환
     public String getPw(int id) {
         String sql = "select pw from schedule_list where id = ?";
         return jdbcTemplate.query(sql, rs -> {
@@ -123,6 +129,7 @@ public class ScheduleRepository {
         }, id);
     }
 
+    // 일정 삭제
     public void delete(int id, ScheduleRequestDto request) {
         String sql = "delete from schedule_list where id = ? and pw = ?";
         jdbcTemplate.update(sql, id, request.getPw());

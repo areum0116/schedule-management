@@ -18,31 +18,38 @@ public class ScheduleService {
         return scheduleRepository.getPw(id) != null && scheduleRepository.getPw(id).equals(request.getPw());
     }
 
+    // 생성자 주입
     public ScheduleService(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
 
+    // 일정 전체 조회
     public List<ScheduleResponseDto> getSchedules() {
         return scheduleRepository.findAll();
     }
 
+    // 일정 생성
     public ScheduleResponseDto createSchedule(ScheduleRequestDto request) {
         Schedule savedSchedule = scheduleRepository.save(new Schedule(request));
         return new ScheduleResponseDto(savedSchedule);
     }
 
+    // 수정일 기준 일정 조회
     public List<ScheduleResponseDto> getSchedulesSortedByUpdateDate() {
         return scheduleRepository.findLatestUpdated();
     }
 
+    // 담당자 id 기준 일정 조회
     public List<ScheduleResponseDto> getSchedulesByManager(int manager_id) {
         return scheduleRepository.findByManager(manager_id);
     }
 
+    // 담당자 id & 수정일 기준 일정 조회
     public List<ScheduleResponseDto> getSchedulesSortedByUpdateDateAndManager(int manager_id) {
         return scheduleRepository.findLatestUpdatedByManager(manager_id);
     }
 
+    // 일정 수정
     public String updateSchedule(int id, ScheduleRequestDto request) {
         if (scheduleRepository.findById(id) == null) {
             return "Schedule not found";
@@ -54,6 +61,7 @@ public class ScheduleService {
         }
     }
 
+    // 일정 삭제
     public String deleteSchedule(int id, ScheduleRequestDto request) {
         if (scheduleRepository.findById(id) == null) {
             return "Schedule not found";

@@ -1,9 +1,7 @@
 package com.example.shcedulemanagement.repository;
 
 import com.example.shcedulemanagement.dto.ManagerResponseDto;
-import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.entity.Manager;
-import com.example.shcedulemanagement.entity.Schedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,11 +17,12 @@ public class ManagerRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
+    @Autowired  // 자동 주입 (생성자 1개라 생략 가능)
     public ManagerRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // 담당자 저장 후 반환
     public Manager save(Manager manager) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "insert into manager (name, email) values (?, ?)";
@@ -42,6 +41,7 @@ public class ManagerRepository {
         return manager;
     }
 
+    // 담당자 목록 리스트 반환
     public List<ManagerResponseDto> findAll() {
         String sql = "select * from manager";
 
