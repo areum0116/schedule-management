@@ -17,4 +17,7 @@
 |일정 삭제|**DELETE**|/schedules/{id}|요청 body|정상 삭제 메시지|200: 정상삭제|
 |담당자 등록|**POST**|/managers|요청 body|등록 정보|200: 정상등록|
 |담당자 전체 조회|**GET**|/managers|요청 param|다건 응답 정보|200: 정상조회|
-|페이지네이션|GET|/v2/schedules?page={page}&size={size}|경로 변수|다건 응답 정보|200: 정상 조회|
+|페이지네이션|**GET**|/v2/schedules?page={page}&size={size}|경로 변수|다건 응답 정보|200: 정상 조회|
+
+### Postman API 명세서
+https://documenter.getpostman.com/view/37319426/2sA3s4nWje
