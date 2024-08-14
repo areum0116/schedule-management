@@ -34,13 +34,13 @@ public class ScheduleRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // 일정 전체 반환
+    // 일정 전체 조회
     public List<ScheduleResponseDto> findAll() {
         String sql = "select * from schedule_list";
         return getScheduleResponseDtos(sql);
     }
 
-    // 단건 일정 저장 후 반환
+    // 일정 저장
     public Schedule save(Schedule schedule) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "insert into schedule_list (to_do, manager_id, pw) values (?, ?, ?)";
@@ -60,7 +60,7 @@ public class ScheduleRepository {
         return schedule;
     }
 
-    // id로 일정 검색 후 responseDto 반환
+    // ID로 일정 조회
     public ScheduleResponseDto findById(int id) {
         String sql = "select * from schedule_list where id = ?";
         return jdbcTemplate.query(sql, rs -> {
@@ -78,13 +78,13 @@ public class ScheduleRepository {
         }, id);
     }
 
-    // 수정일 기준 내림차순 정렬 결과 리스트 반환
+    // 수정일 기준 내림차순 일정 조회
     public List<ScheduleResponseDto> findLatestUpdated() {
         String sql = "select * from schedule_list order by updated_at desc";
         return getScheduleResponseDtos(sql);
     }
 
-    // 담당자 id 기준 리스트 반환
+    // 담당자 ID 기준 일정 조회
     public List<ScheduleResponseDto> findByManager(int manager_id) {
         String sql = "select * from schedule_list where manager_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -96,7 +96,7 @@ public class ScheduleRepository {
         }, manager_id);
     }
 
-    // 수정일, 담담자 id 기준 리스트 반환
+    // 담당자 ID 및 수정일 기준 일정 조회
     public List<ScheduleResponseDto> findLatestUpdatedByManager(int manager_id) {
         String sql = "select * from schedule_list where manager_id = ? order by updated_at desc";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -116,16 +116,10 @@ public class ScheduleRepository {
                 new Timestamp(System.currentTimeMillis()), id, request.getPw());
     }
 
-    // 일정 비밀번호 검색 후 반환
+    // 비밀번호 조회
     public String getPw(int id) {
         String sql = "select pw from schedule_list where id = ?";
-        return jdbcTemplate.query(sql, rs -> {
-            if (rs.next()) {
-                return rs.getString("pw");
-            } else {
-                return null;
-            }
-        }, id);
+        return jdbcTemplate.query(sql, rs -> rs.next() ? rs.getString("pw") : null, id);
     }
 
     // 일정 삭제
