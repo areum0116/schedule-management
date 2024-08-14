@@ -15,9 +15,17 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
+@RequestMapping("/schedules")
 public class ScheduleController {
     private final ScheduleService scheduleService;
     private final ScheduleRepository scheduleRepository;
+
+    // BindingResult 검증
+    private void validateRequest(BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        }
+    }
 
     // 생성자 주입
     public ScheduleController(ScheduleService scheduleService, ScheduleRepository scheduleRepository) {
@@ -26,13 +34,12 @@ public class ScheduleController {
     }
 
     // 일정 조회
-    @GetMapping("/schedules")
+    @GetMapping
     public List<ScheduleResponseDto> getSchedules(@RequestParam(required = false) String sort, Integer manager_id) {
-        if (sort != null && sort.equalsIgnoreCase("updateDate")) {
-            if (manager_id != null) // 수정일 & 담당자 id 기준 조회
-                return scheduleService.getSchedulesSortedByUpdateDateAndManager(manager_id);
-            else    // 수정일 기준 정렬 조회
-                return scheduleService.getSchedulesSortedByUpdateDate();
+        if ("updateDate".equalsIgnoreCase(sort)) {
+            return manager_id != null
+                    ? scheduleService.getSchedulesSortedByUpdateDateAndManager(manager_id) // 수정일 & 담당자 id 기준 조회
+                    : scheduleService.getSchedulesSortedByUpdateDate();     // 수정일 기준 조회
         } else if (manager_id != null) // 담당자 id 기준 조회
             return scheduleService.getSchedulesByManager(manager_id);
         else // 둘 다 해당 X (전체 조회)
@@ -40,15 +47,14 @@ public class ScheduleController {
     }
 
     // 일정 생성
-    @PostMapping("/schedules")
+    @PostMapping
     public ScheduleResponseDto createSchedule(@RequestBody @Valid ScheduleRequestDto request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors())  // 잘못된 입력 (할일 최대 200자, 필수값, 비밀번호 필수값)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        validateRequest(bindingResult);     // 잘못된 입력 (할일 최대 200자, 필수값, 비밀번호 필수값)
         return scheduleService.createSchedule(request);
     }
 
     // id로 단건 일정 검색
-    @GetMapping("/schedules/{id}")
+    @GetMapping("/{id}")
     public ScheduleResponseDto findById(@PathVariable int id) {
         // 잘못된 정보 조회
         if(scheduleRepository.findById(id) == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule not found");
@@ -56,11 +62,10 @@ public class ScheduleController {
     }
 
     // 일정 수정
-    @PutMapping("/schedules/{id}")
+    @PutMapping("/{id}")
     public String updateSchedule(@PathVariable int id, @RequestBody @Valid ScheduleRequestDto request, BindingResult bindingResult) {
         // 잘못된 입력 (할일 최대 200자, 필수값, 비밀번호 필수값)
-        if (bindingResult.hasErrors()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
-
+        validateRequest(bindingResult);
         try {
             return scheduleService.updateSchedule(id, request);
         } catch (Exception e) {
@@ -71,7 +76,7 @@ public class ScheduleController {
     }
 
     // 일정 삭제
-    @DeleteMapping("/schedules/{id}")
+    @DeleteMapping("/{id}")
     public String deleteSchedule(@PathVariable int id, @RequestBody ScheduleRequestDto request) {
         try {
             return scheduleService.deleteSchedule(id, request);
@@ -83,12 +88,10 @@ public class ScheduleController {
     }
 
     // 페이지네이션
-    @GetMapping("/v2/schedules")
+    @GetMapping("/v2")
     public List<ScheduleResponseDto> getSchedulesV2(@RequestParam(required = false) Integer page, Integer size) {
-        if(page != null && size != null) {
-            return scheduleService.getSchedulesV2(page, size);
-        } else {
-            return scheduleService.getSchedules();
-        }
+        return (page != null && size != null)
+                ? scheduleService.getSchedulesV2(page, size)
+                : scheduleService.getSchedules();
     }
 }
