@@ -3,6 +3,7 @@ package com.example.shcedulemanagement.controller;
 import com.example.shcedulemanagement.dto.ScheduleRequestDto;
 import com.example.shcedulemanagement.dto.ScheduleResponseDto;
 import com.example.shcedulemanagement.exceptions.InvalidEntityIdException;
+import com.example.shcedulemanagement.exceptions.InvalidPasswordException;
 import com.example.shcedulemanagement.repository.ScheduleRepository;
 import com.example.shcedulemanagement.service.ScheduleService;
 import jakarta.validation.Valid;
@@ -24,6 +25,22 @@ public class ScheduleController {
     private void validateRequest(BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        }
+    }
+
+    @FunctionalInterface
+    private interface ServiceOperator {
+        String execute();
+    }
+
+    // 예외 처리 래퍼 메서드
+    private String handleServiceException(ServiceOperator operation) {
+        try {
+            return operation.execute();
+        } catch (InvalidEntityIdException e) {  // 존재하지 않는 ID
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (InvalidPasswordException e) {  // 틀린 비밀번호
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }
 
@@ -66,25 +83,13 @@ public class ScheduleController {
     public String updateSchedule(@PathVariable int id, @RequestBody @Valid ScheduleRequestDto request, BindingResult bindingResult) {
         // 잘못된 입력 (할일 최대 200자, 필수값, 비밀번호 필수값)
         validateRequest(bindingResult);
-        try {
-            return scheduleService.updateSchedule(id, request);
-        } catch (Exception e) {
-            if(e instanceof InvalidEntityIdException)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage()); // 존재하지 않는 id
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage()); // 비밀번호 불일치
-        }
+        return handleServiceException(() -> scheduleService.updateSchedule(id, request));
     }
 
     // 일정 삭제
     @DeleteMapping("/{id}")
     public String deleteSchedule(@PathVariable int id, @RequestBody ScheduleRequestDto request) {
-        try {
-            return scheduleService.deleteSchedule(id, request);
-        } catch (Exception e) {
-            if(e instanceof InvalidEntityIdException)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage()); // 존재하지 않는 id
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage()); // 비밀번호 불일치
-        }
+        return handleServiceException(() -> scheduleService.deleteSchedule(id, request));
     }
 
     // 페이지네이션
