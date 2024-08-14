@@ -10,14 +10,26 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
     // 입력받은 비밀번호 검사
-    private boolean checkValidPw(int id, ScheduleRequestDto request) {
+    private boolean isValidPassword(int id, ScheduleRequestDto request) {
         return scheduleRepository.getPw(id) != null && scheduleRepository.getPw(id).equals(request.getPw());
+    }
+
+    // 일정 ID 및 비밀번호 검증
+    private void validateSchedule(int id, ScheduleRequestDto request) throws InvalidEntityIdException, InvalidPasswordException {
+        // 존재하지 않는 id
+        Optional.ofNullable(scheduleRepository.findById(id))
+                .orElseThrow(() -> new InvalidEntityIdException("No such entity with id " + id));
+
+        // 틀린 비밀번호
+        if (!isValidPassword(id, request))
+            throw new InvalidPasswordException("Invalid password");
     }
 
     // 생성자 주입
@@ -53,26 +65,16 @@ public class ScheduleService {
 
     // 일정 수정
     public String updateSchedule(int id, ScheduleRequestDto request) throws InvalidEntityIdException, InvalidPasswordException {
-        if (scheduleRepository.findById(id) == null) {  // 존재하지 않는 id
-            throw new InvalidEntityIdException("No such entity with id " + id);
-        } else if (!checkValidPw(id, request)) {    // 틀린 비밀번호
-            throw new InvalidPasswordException("Invalid password");
-        } else {
-            scheduleRepository.update(id, request);
-            return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
-        }
+        validateSchedule(id, request);
+        scheduleRepository.update(id, request);
+        return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
     }
 
     // 일정 삭제
     public String deleteSchedule(int id, ScheduleRequestDto request) throws InvalidEntityIdException, InvalidPasswordException {
-        if (scheduleRepository.findById(id) == null) {  // 존재하지 않는 id
-            throw new InvalidEntityIdException("No such entity with id " + id);
-        } else if (!checkValidPw(id, request)) {    // 틀린 비밀번호
-            throw new InvalidPasswordException("Invalid password");
-        } else {
-            scheduleRepository.delete(id, request);
-            return "Schedule deleted";
-        }
+        validateSchedule(id, request);
+        scheduleRepository.delete(id, request);
+        return "Schedule deleted";
     }
 
     // 페이지네이션
