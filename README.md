@@ -24,7 +24,7 @@ https://documenter.getpostman.com/view/37319426/2sA3s4nWje
 
 
 ## ERD
-<img width="266" alt="image" src="https://github.com/user-attachments/assets/a4ba4c6c-3080-4d65-ad9e-3b9f3ae86f17">
+<img width="436" alt="image" src="https://github.com/user-attachments/assets/62a3ef8f-6748-41b5-8d05-9386c83b8702">
 
 
 ## SQL
